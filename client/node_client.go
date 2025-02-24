@@ -5,37 +5,49 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"github.com/ByteForge-Systems/vpn-api/utils"
 )
+var nodeAPIBaseURL string
 
-const (
-	nodeAPIBaseURL = "http://185.239.142.164:8083" // вроде бы так будет
-)
+func init() {
+	utils.LoadEnv()
+	nodeAPIBaseURL = utils.GetEnv("NODE_API_BASE_URL")
+
+}
+type Client struct {
+    ID   string `json:"id"`
+    Flow string `json:"flow"`
+}
 
 // отправляет запрос на добавление пользователя в конфиг
-func AddUser(userID string) (string, error) {
-	url := fmt.Sprintf("%s/api/user", nodeAPIBaseURL)
-	payload := map[string]string{"id": userID}
-	jsonData, err := json.Marshal(payload)
-	if err != nil {
-		return "", fmt.Errorf("failed to marshal payload: %w", err)
-	}
+func AddUser(newUUID string) (string, error) {
+    url := fmt.Sprintf("%s/api/user", nodeAPIBaseURL)
 
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return "", fmt.Errorf("failed to send request: %w", err)
-	}
-	defer resp.Body.Close()
+    requestBody := map[string]string{
+        "uuid": newUUID,
+    }
 
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
+    jsonData, err := json.Marshal(requestBody)
+    if err != nil {
+        return "", fmt.Errorf("failed to marshal request body: %w", err)
+    }
 
-	var result map[string]string
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", fmt.Errorf("failed to decode response: %w", err)
-	}
+    resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+    if err != nil {
+        return "", fmt.Errorf("failed to send request: %w", err)
+    }
+    defer resp.Body.Close()
 
-	return result["id"], nil
+    if resp.StatusCode != http.StatusOK {
+        return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+    }
+
+    var result map[string]string
+    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+        return "", fmt.Errorf("failed to decode response: %w", err)
+    }
+
+    return result["id"], nil
 }
 
 // отправляет запрос на удаление пользователя из конфига
@@ -79,6 +91,31 @@ func GenerateVLESSLink(userID string) (string, error) {
 	}
 
 	return result["link"], nil
+}
+
+// need test
+func GetAllUsers() ([]Client, error) {
+    url := fmt.Sprintf("%s/api/user/all", nodeAPIBaseURL)
+    resp, err := http.Get(url)
+    if err != nil {
+        return nil, fmt.Errorf("failed to send request: %w", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+    }
+
+    // Декодируем в структуру с полем "users"
+    var response struct {
+        Users []Client `json:"users"`
+    }
+
+    if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+        return nil, fmt.Errorf("failed to decode response: %w", err)
+    }
+
+    return response.Users, nil
 }
 
 // отправляет запрос на перезапуск Xray
@@ -130,6 +167,7 @@ func StopXray() error {
 // отправляет запрос на получение статуса Xray
 func GetXrayStatus() (string, error) {
 	url := fmt.Sprintf("%s/api/management/status", nodeAPIBaseURL)
+	fmt.Println("Requesting URL:", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("failed to send request: %w", err)
