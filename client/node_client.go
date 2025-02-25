@@ -21,7 +21,7 @@ type Client struct {
 
 // отправляет запрос на добавление пользователя в конфиг
 func AddUser(newUUID string) (string, error) {
-    url := fmt.Sprintf("%s/api/user", nodeAPIBaseURL)
+    url := fmt.Sprintf("%s/api/key", nodeAPIBaseURL)
 
     requestBody := map[string]string{
         "uuid": newUUID,
@@ -52,7 +52,7 @@ func AddUser(newUUID string) (string, error) {
 
 // отправляет запрос на удаление пользователя из конфига
 func RemoveUser(userID string) error {
-	url := fmt.Sprintf("%s/api/user/%s", nodeAPIBaseURL, userID)
+	url := fmt.Sprintf("%s/api/key/%s", nodeAPIBaseURL, userID)
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -74,7 +74,7 @@ func RemoveUser(userID string) error {
 
 // отправляет запрос на генерацию VLESS-ссылки для пользователя
 func GenerateVLESSLink(userID string) (string, error) {
-	url := fmt.Sprintf("%s/api/user/%s/link", nodeAPIBaseURL, userID)
+	url := fmt.Sprintf("%s/api/key/%s/link", nodeAPIBaseURL, userID)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("failed to send request: %w", err)
@@ -95,7 +95,7 @@ func GenerateVLESSLink(userID string) (string, error) {
 
 // need test
 func GetAllUsers() ([]Client, error) {
-    url := fmt.Sprintf("%s/api/user/all", nodeAPIBaseURL)
+    url := fmt.Sprintf("%s/api/key/all", nodeAPIBaseURL)
     resp, err := http.Get(url)
     if err != nil {
         return nil, fmt.Errorf("failed to send request: %w", err)
