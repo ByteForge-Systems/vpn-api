@@ -7,7 +7,15 @@ import (
 	"github.com/google/uuid"
 )
 
-
+// @Summary Добавить пользователя
+// @Description Добавляет нового пользователя в систему
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body models.User true "Данные пользователя"
+// @Success 200 {object} models.User
+// @Failure 400 {object} models.ErrorResponse
+// @Router /api/user/ [post]
 func AddUser(c *gin.Context) {
     newUUID := uuid.New().String()
     
@@ -20,6 +28,14 @@ func AddUser(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"uuid": newUUID})
 }
 
+// @Summary Удалить пользователя
+// @Description Удаляет пользователя по ID
+// @Tags User
+// @Produce json
+// @Param id path string true "ID пользователя"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /api/user/{id} [delete]
 func RemoveUser(c *gin.Context) {
 	userID := c.Param("id")
 	err := client.RemoveUser(userID)
@@ -31,6 +47,12 @@ func RemoveUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User deleted"})
 }
 
+// @Summary Получить всех пользователей
+// @Description Возвращает список всех пользователей
+// @Tags User
+// @Produce json
+// @Success 200 {array} models.User
+// @Router /api/user/all [get]
 func GetAllUsers(c *gin.Context) {
     clients, err := client.GetAllUsers() // слайс
     if err != nil {
@@ -40,7 +62,14 @@ func GetAllUsers(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"users": clients})
 }
-
+// @Summary Сгенерировать VLESS-ссылку
+// @Description Генерирует VLESS-ссылку для пользователя по ID
+// @Tags User
+// @Produce json
+// @Param id path string true "ID пользователя"
+// @Success 200 {object} models.VLESSLink
+// @Failure 404 {object} models.ErrorResponse
+// @Router /api/user/{id}/link [get]
 func GenerateVLESSLink(c *gin.Context) {
 	userID := c.Param("id")
 	link, err := client.GenerateVLESSLink(userID)
