@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/ByteForge-Systems/vpn-api/client"
-	"github.com/ByteForge-Systems/vpn-api/models"
+	_"github.com/ByteForge-Systems/vpn-api/api/models"
 )
 
 // @Summary Перезапустить Xray

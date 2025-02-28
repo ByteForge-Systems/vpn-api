@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ByteForge-Systems/vpn-api/client"
 	"github.com/google/uuid"
+	_ "github.com/ByteForge-Systems/vpn-api/api/models"
 )
 
 // @Summary Добавить пользователя
