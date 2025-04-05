@@ -1,12 +1,12 @@
 package main
 
 import (
+	_ "github.com/ByteForge-Systems/vpn-api/api/docs"
+	routes2 "github.com/ByteForge-Systems/vpn-api/internal/transort/routes"
 	"github.com/gin-gonic/gin"
-	"github.com/ByteForge-Systems/vpn-api/api/routes"
-	"github.com/ByteForge-Systems/vpn-api/utils"
 	swaggerFiles "github.com/swaggo/files"
-    ginSwagger "github.com/swaggo/gin-swagger"
-    _ "github.com/ByteForge-Systems/vpn-api/api/docs"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
 )
 
 // @title Xray Management API
@@ -24,20 +24,17 @@ import (
 // @host localhost:8080
 // @BasePath /
 
-var NODE_API_BASE_URL string
-func init() {
-	utils.LoadEnv()
-	NODE_API_BASE_URL = utils.GetEnv("NODE_API_BASE_URL")
-}
-
 func main() {
 	router := gin.Default()
 
 	// Swagger UI
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	routes.SetupUserRoutes(router)
-	routes.SetupManagementRoutes(router)
+	routes2.SetupUserRoutes(router)
+	routes2.SetupManagementRoutes(router)
 
-	router.Run(":8080")
+	if err := router.Run(":8080"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+
 }

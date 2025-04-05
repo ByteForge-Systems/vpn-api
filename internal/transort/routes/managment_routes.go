@@ -1,8 +1,8 @@
 package routes
 
 import (
+	"github.com/ByteForge-Systems/vpn-api/internal/transort/handlers"
 	"github.com/gin-gonic/gin"
-	"github.com/ByteForge-Systems/vpn-api/api/handlers"
 )
 
 func SetupManagementRoutes(router *gin.Engine) {
