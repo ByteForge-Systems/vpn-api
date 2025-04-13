@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/ByteForge-Systems/vpn-api/internal/transort/handlers"
+	"github.com/ByteForge-Systems/vpn-api/internal/transport/handlers"
 	"github.com/gin-gonic/gin"
 )
 

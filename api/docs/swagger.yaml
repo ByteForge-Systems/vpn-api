@@ -1,30 +1,24 @@
 basePath: /
 definitions:
-  models.ErrorResponse:
+  models.Node:
     properties:
-      error:
+      comment:
         type: string
-    type: object
-  models.SuccessResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  models.User:
-    properties:
-      flow:
+      country:
         type: string
       id:
+        type: integer
+      ip:
         type: string
-    type: object
-  models.VLESSLink:
-    properties:
-      link:
+      is_online:
+        type: boolean
+      password:
         type: string
-    type: object
-  models.XrayStatus:
-    properties:
-      status:
+      port:
+        type: integer
+      ssh_port:
+        type: integer
+      username:
         type: string
     type: object
 host: localhost:8080
@@ -41,155 +35,153 @@ info:
   title: Xray Management API
   version: "1.0"
 paths:
-  /api/management/restart:
-    post:
-      description: Перезапускает Xray
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Перезапустить Xray
-      tags:
-      - Management
-  /api/management/start:
-    post:
-      description: Запускает Xray
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Запустить Xray
-      tags:
-      - Management
-  /api/management/status:
+  /api/nodes:
     get:
-      description: Возвращает текущий статус Xray
+      description: Получает список всех VPN-узлов
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Список узлов, пароли не возвращаются
           schema:
-            $ref: '#/definitions/models.XrayStatus'
-      summary: Получить статус Xray
-      tags:
-      - Management
-  /api/management/stop:
-    post:
-      description: Останавливает Xray
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            items:
+              $ref: '#/definitions/models.Node'
+            type: array
         "500":
-          description: Internal Server Error
+          description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Остановить Xray
+            additionalProperties:
+              type: string
+            type: object
+      summary: Список всех узлов
       tags:
-      - Management
-  /api/user/:
+      - узлы
     post:
       consumes:
       - application/json
-      description: Добавляет нового пользователя в систему
+      description: Создает новый VPN-узел с указанными данными
       parameters:
-      - description: Данные пользователя
+      - description: Данные узла
         in: body
-        name: user
+        name: node
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.Node'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Узел создан, пароль не возвращается
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.Node'
         "400":
-          description: Bad Request
+          description: Неверный формат запроса
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Добавить пользователя
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создать новый узел
       tags:
-      - User
-  /api/user/{id}:
+      - узлы
+  /api/nodes/{id}:
     delete:
-      description: Удаляет пользователя по ID
+      description: Удаляет VPN-узел по его ID
       parameters:
-      - description: ID пользователя
+      - description: ID узла
         in: path
         name: id
         required: true
-        type: string
-      produces:
-      - application/json
+        type: integer
       responses:
-        "200":
-          description: OK
+        "204":
+          description: Нет содержимого
+        "400":
+          description: Неверный ID узла
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            additionalProperties:
+              type: string
+            type: object
         "404":
-          description: Not Found
+          description: Узел не найден
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Удалить пользователя
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить узел
       tags:
-      - User
-  /api/user/{id}/link:
+      - узлы
     get:
-      description: Генерирует VLESS-ссылку для пользователя по ID
+      description: Получает VPN-узел по его идентификатору
       parameters:
-      - description: ID пользователя
+      - description: ID узла
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Детали узла, пароль не возвращается
           schema:
-            $ref: '#/definitions/models.VLESSLink'
+            $ref: '#/definitions/models.Node'
+        "400":
+          description: Неверный ID узла
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
-          description: Not Found
+          description: Узел не найден
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Сгенерировать VLESS-ссылку
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить узел по ID
       tags:
-      - User
-  /api/user/all:
-    get:
-      description: Возвращает список всех пользователей
+      - узлы
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующий VPN-узел по его ID
+      parameters:
+      - description: ID узла
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные узла
+        in: body
+        name: node
+        required: true
+        schema:
+          $ref: '#/definitions/models.Node'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Обновленный узел, пароль не возвращается
           schema:
-            items:
-              $ref: '#/definitions/models.User'
-            type: array
-      summary: Получить всех пользователей
+            $ref: '#/definitions/models.Node'
+        "400":
+          description: Неверный формат запроса или ID узла
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Узел не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновить узел
       tags:
-      - User
+      - узлы
 swagger: "2.0"

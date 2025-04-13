@@ -4,16 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/ByteForge-Systems/vpn-api/internal/utils"
 	"log"
 	"net/http"
+
+	"github.com/ByteForge-Systems/vpn-api/internal/config"
 )
 
 var nodeAPIBaseURL string
 
 func init() {
-	utils.LoadEnv()
-	nodeAPIBaseURL = utils.GetEnv("NODE_API_BASE_URL")
+	config.LoadEnv()
+	nodeAPIBaseURL = config.GetEnv("NODE_API_BASE_URL")
 
 }
 

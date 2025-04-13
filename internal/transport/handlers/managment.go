@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"net/http"
+
 	_ "github.com/ByteForge-Systems/vpn-api/internal/models"
 	"github.com/ByteForge-Systems/vpn-api/internal/node_client"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // @Summary Перезапустить Xray

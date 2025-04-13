@@ -1,12 +1,18 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	_ "github.com/ByteForge-Systems/vpn-api/api/docs"
-	routes2 "github.com/ByteForge-Systems/vpn-api/internal/transort/routes"
+	"github.com/ByteForge-Systems/vpn-api/internal/config"
+	"github.com/ByteForge-Systems/vpn-api/internal/db"
+	"github.com/ByteForge-Systems/vpn-api/internal/db/nodes"
+	"github.com/ByteForge-Systems/vpn-api/internal/transport/handlers"
+	"github.com/ByteForge-Systems/vpn-api/internal/transport/routes"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"log"
 )
 
 // @title Xray Management API
@@ -25,16 +31,33 @@ import (
 // @BasePath /
 
 func main() {
+	// Загружаем конфигурацию
+	cfg := config.LoadConfig()
+
+	// Подключаемся к базе данных
+	dbConn, err := db.Connect(cfg)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer dbConn.Close()
+
+	// Настраиваем Gin
 	router := gin.Default()
 
 	// Swagger UI
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	routes2.SetupUserRoutes(router)
-	routes2.SetupManagementRoutes(router)
+	// Инициализируем хранилище и хендлер для узлов
+	nodeStore := nodes.NewNodeStore(dbConn)
+	nodesHandler := handlers.NewNodeHandler(nodeStore)
 
-	if err := router.Run(":8080"); err != nil {
+	// Настраиваем маршруты
+	routes.SetupUserRoutes(router)
+	routes.RegisterNodesRoutes(router, nodesHandler)
+
+	// Запускаем сервер с портом из конфига
+	addr := fmt.Sprintf(":%s", cfg.Port)
+	if err := router.Run(addr); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
-
 }
