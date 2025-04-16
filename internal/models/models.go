@@ -17,15 +17,17 @@ type User struct {
 }
 
 type Node struct {
-	ID       int    `json:"id"`
-	IP       string `json:"ip"`
-	Port     int    `json:"port"`
-	SSHPort  int    `json:"ssh_port"`
-	Country  string `json:"country"`
-	Comment  string `json:"comment"`
-	IsOnline bool   `json:"is_online"`
-	Username string `json:"username"`
-	Password string `json:"password,omitempty"`
+	ID          int    `json:"id"`
+	IP          string `json:"ip"`
+	Port        int    `json:"port"`
+	PublicKey   string `json:"public_key,omitempty"`
+	PrivateKey  string `json:"private_key,omitempty"`
+	Country     string `json:"country"`
+	Comment     string `json:"comment"`
+	IsOnline    bool   `json:"is_online"`
+	SSHPort     int    `json:"ssh_port"`
+	SSHUsername string `json:"ssh_username"`
+	SSHPassword string `json:"ssh_password,omitempty"`
 }
 
 // VLESSLink представляет VLESS-ссылку
