@@ -18,23 +18,27 @@ func NewNodeStore(db *sql.DB) *NodeStore {
 // Create inserts a new node into the database.
 func (s *NodeStore) Create(node *models.Node) error {
 	query := `
-		INSERT INTO nodes (ip, port, ssh_port, country, comment, is_online, username, password)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		INSERT INTO nodes (ip, port, public_key, private_key, country, comment, is_online, ssh_port, ssh_username, ssh_password)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING id`
-	return s.db.QueryRow(query, node.IP, node.Port, node.SSHPort, node.Country, node.Comment, node.IsOnline, node.Username, node.Password).
-		Scan(&node.ID)
+	return s.db.QueryRow(query,
+		node.IP, node.Port, node.PublicKey, node.PrivateKey,
+		node.Country, node.Comment, node.IsOnline,
+		node.SSHPort, node.SSHUsername, node.SSHPassword,
+	).Scan(&node.ID)
 }
 
 // Get retrieves a node by ID.
 func (s *NodeStore) Get(id int) (*models.Node, error) {
 	node := &models.Node{}
 	query := `
-		SELECT id, ip, port, ssh_port, country, comment, is_online, username, password
+		SELECT id, ip, port, public_key, private_key, country, comment, is_online, ssh_port, ssh_username, ssh_password
 		FROM nodes
 		WHERE id = $1`
 	err := s.db.QueryRow(query, id).Scan(
-		&node.ID, &node.IP, &node.Port, &node.SSHPort, &node.Country,
-		&node.Comment, &node.IsOnline, &node.Username, &node.Password,
+		&node.ID, &node.IP, &node.Port, &node.PublicKey, &node.PrivateKey,
+		&node.Country, &node.Comment, &node.IsOnline,
+		&node.SSHPort, &node.SSHUsername, &node.SSHPassword,
 	)
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("node not found")
@@ -48,7 +52,7 @@ func (s *NodeStore) Get(id int) (*models.Node, error) {
 // List retrieves all nodes.
 func (s *NodeStore) List() ([]*models.Node, error) {
 	query := `
-		SELECT id, ip, port, ssh_port, country, comment, is_online, username, password
+		SELECT id, ip, port, public_key, private_key, country, comment, is_online, ssh_port, ssh_username, ssh_password
 		FROM nodes`
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -60,8 +64,9 @@ func (s *NodeStore) List() ([]*models.Node, error) {
 	for rows.Next() {
 		node := &models.Node{}
 		if err := rows.Scan(
-			&node.ID, &node.IP, &node.Port, &node.SSHPort, &node.Country,
-			&node.Comment, &node.IsOnline, &node.Username, &node.Password,
+			&node.ID, &node.IP, &node.Port, &node.PublicKey, &node.PrivateKey,
+			&node.Country, &node.Comment, &node.IsOnline,
+			&node.SSHPort, &node.SSHUsername, &node.SSHPassword,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan node: %w", err)
 		}
@@ -74,9 +79,14 @@ func (s *NodeStore) List() ([]*models.Node, error) {
 func (s *NodeStore) Update(node *models.Node) error {
 	query := `
 		UPDATE nodes
-		SET ip = $1, port = $2, ssh_port = $3, country = $4, comment = $5, is_online = $6, username = $7, password = $8
-		WHERE id = $9`
-	result, err := s.db.Exec(query, node.IP, node.Port, node.SSHPort, node.Country, node.Comment, node.IsOnline, node.Username, node.Password, node.ID)
+		SET ip = $1, port = $2, public_key = $3, private_key = $4, country = $5,
+		    comment = $6, is_online = $7, ssh_port = $8, ssh_username = $9, ssh_password = $10
+		WHERE id = $11`
+	result, err := s.db.Exec(query,
+		node.IP, node.Port, node.PublicKey, node.PrivateKey, node.Country,
+		node.Comment, node.IsOnline, node.SSHPort, node.SSHUsername, node.SSHPassword,
+		node.ID,
+	)
 	if err != nil {
 		return fmt.Errorf("failed to update node: %w", err)
 	}
