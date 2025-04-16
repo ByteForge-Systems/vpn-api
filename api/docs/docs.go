@@ -24,107 +24,39 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/management/restart": {
-            "post": {
-                "description": "Перезапускает Xray",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Management"
-                ],
-                "summary": "Перезапустить Xray",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/management/start": {
-            "post": {
-                "description": "Запускает Xray",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Management"
-                ],
-                "summary": "Запустить Xray",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/management/status": {
+        "/api/nodes": {
             "get": {
-                "description": "Возвращает текущий статус Xray",
+                "description": "Получает список всех VPN-узлов",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Management"
+                    "узлы"
                 ],
-                "summary": "Получить статус Xray",
+                "summary": "Список всех узлов",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Список узлов, пароли не возвращаются",
                         "schema": {
-                            "$ref": "#/definitions/models.XrayStatus"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/management/stop": {
-            "post": {
-                "description": "Останавливает Xray",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Management"
-                ],
-                "summary": "Остановить Xray",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Node"
+                            }
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
-            }
-        },
-        "/api/user/": {
+            },
             "post": {
-                "description": "Добавляет нового пользователя в систему",
+                "description": "Создает новый VPN-узел с указанными данными",
                 "consumes": [
                     "application/json"
                 ],
@@ -132,73 +64,62 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "узлы"
                 ],
-                "summary": "Добавить пользователя",
+                "summary": "Создать новый узел",
                 "parameters": [
                     {
-                        "description": "Данные пользователя",
-                        "name": "user",
+                        "description": "Данные узла",
+                        "name": "node",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.Node"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Узел создан, пароль не возвращается",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.Node"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Неверный формат запроса",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
-                    }
-                }
-            }
-        },
-        "/api/user/all": {
-            "get": {
-                "description": "Возвращает список всех пользователей",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Получить всех пользователей",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.User"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     }
                 }
             }
         },
-        "/api/user/{id}": {
-            "delete": {
-                "description": "Удаляет пользователя по ID",
+        "/api/nodes/{id}": {
+            "get": {
+                "description": "Получает VPN-узел по его идентификатору",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "узлы"
                 ],
-                "summary": "Удалить пользователя",
+                "summary": "Получить узел по ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID пользователя",
+                        "type": "integer",
+                        "description": "ID узла",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -206,50 +127,123 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Детали узла, пароль не возвращается",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "$ref": "#/definitions/models.Node"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный ID узла",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Узел не найден",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
-            }
-        },
-        "/api/user/{id}/link": {
-            "get": {
-                "description": "Генерирует VLESS-ссылку для пользователя по ID",
+            },
+            "put": {
+                "description": "Обновляет существующий VPN-узел по его ID",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "узлы"
                 ],
-                "summary": "Сгенерировать VLESS-ссылку",
+                "summary": "Обновить узел",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID пользователя",
+                        "type": "integer",
+                        "description": "ID узла",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Обновленные данные узла",
+                        "name": "node",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Node"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Обновленный узел, пароль не возвращается",
+                        "schema": {
+                            "$ref": "#/definitions/models.Node"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный формат запроса или ID узла",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Узел не найден",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удаляет VPN-узел по его ID",
+                "tags": [
+                    "узлы"
+                ],
+                "summary": "Удалить узел",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID узла",
                         "name": "id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "Нет содержимого"
+                    },
+                    "400": {
+                        "description": "Неверный ID узла",
                         "schema": {
-                            "$ref": "#/definitions/models.VLESSLink"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Узел не найден",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -257,45 +251,34 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.ErrorResponse": {
+        "models.Node": {
             "type": "object",
             "properties": {
-                "error": {
+                "comment": {
                     "type": "string"
-                }
-            }
-        },
-        "models.SuccessResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "flow": {
+                },
+                "country": {
                     "type": "string"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "ip": {
                     "type": "string"
-                }
-            }
-        },
-        "models.VLESSLink": {
-            "type": "object",
-            "properties": {
-                "link": {
+                },
+                "is_online": {
+                    "type": "boolean"
+                },
+                "password": {
                     "type": "string"
-                }
-            }
-        },
-        "models.XrayStatus": {
-            "type": "object",
-            "properties": {
-                "status": {
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "ssh_port": {
+                    "type": "integer"
+                },
+                "username": {
                     "type": "string"
                 }
             }

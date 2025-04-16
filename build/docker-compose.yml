@@ -1,10 +1,47 @@
-version: '3.8'
 services:
-  my-api:
+  app-api:
+    build:
+      context: ../
+      dockerfile: build/Dockerfile
+    env_file:
+      - ../.env
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:16
+    env_file:
+      - ../.env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  migrate:
     build:
       context: ..
-      dockerfile: ./build/Dockerfile
-    container_name: my-api
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
+      dockerfile: build/Dockerfile
+    command: ["migrate", "-path", "internal/db/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable", "up"]
+    depends_on:
+      - postgres
+    env_file:
+      - ../.env
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

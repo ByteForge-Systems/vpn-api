@@ -1,12 +1,12 @@
 package routes
 
 import (
-	"github.com/ByteForge-Systems/vpn-api/internal/transort/handlers"
+	"github.com/ByteForge-Systems/vpn-api/internal/transport/handlers"
 	"github.com/gin-gonic/gin"
 )
 
 func SetupUserRoutes(router *gin.Engine) {
-	user := router.Group("/api/user")
+	user := router.Group("/api/users")
 	{
 		user.POST("/", handlers.AddUser)
 		user.DELETE("/:id", handlers.RemoveUser)
