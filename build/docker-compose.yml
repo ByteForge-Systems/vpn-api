@@ -8,7 +8,8 @@ services:
     ports:
       - "${PORT}:${PORT}"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -26,6 +27,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   migrate:
     build:
@@ -33,7 +39,8 @@ services:
       dockerfile: build/Dockerfile
     command: ["migrate", "-path", "internal/db/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable", "up"]
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - ../.env
     networks:
