@@ -1,4 +1,0 @@
-CREATE TABLE users (
-    id VARCHAR(255) PRIMARY KEY,
-    flow VARCHAR(255) NOT NULL
-);

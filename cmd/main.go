@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/ByteForge-Systems/vpn-api/internal/db"
 	"log"
 
 	_ "github.com/ByteForge-Systems/vpn-api/api/docs"
 	"github.com/ByteForge-Systems/vpn-api/internal/config"
-	"github.com/ByteForge-Systems/vpn-api/internal/db"
 	"github.com/ByteForge-Systems/vpn-api/internal/db/nodes"
 	"github.com/ByteForge-Systems/vpn-api/internal/transport/handlers"
 	"github.com/ByteForge-Systems/vpn-api/internal/transport/routes"
@@ -52,7 +52,7 @@ func main() {
 	nodesHandler := handlers.NewNodeHandler(nodeStore)
 
 	// Настраиваем маршруты
-	routes.SetupUserRoutes(router)
+	routes.SetupUserRoutes(router, dbConn)
 	routes.RegisterNodesRoutes(router, nodesHandler)
 
 	// Запускаем сервер с портом из конфига

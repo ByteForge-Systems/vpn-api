@@ -5,12 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupManagementRoutes(router *gin.Engine) {
+func SetupManagementRoutes(router *gin.Engine, handler *handlers.NodeHandler) {
 	management := router.Group("/api/management")
 	{
-		management.POST("/restart", handlers.RestartXray)
-		management.GET("/status", handlers.GetXrayStatus)
-		management.POST("/start", handlers.StartXray)
-		management.POST("/stop", handlers.StopXray)
+		management.POST("/restart", handler.RestartXray)
+		management.GET("/status", handler.GetXrayStatus)
+		management.POST("/start", handler.StartXray)
+		management.POST("/stop", handler.StopXray)
 	}
 }

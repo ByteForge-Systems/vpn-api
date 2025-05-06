@@ -3,16 +3,16 @@ package nodes
 import (
 	"database/sql"
 	"fmt"
-
 	"github.com/ByteForge-Systems/vpn-api/internal/models"
+	"github.com/jmoiron/sqlx"
 )
 
 type NodeStore struct {
-	db *sql.DB
+	DB *sqlx.DB
 }
 
-func NewNodeStore(db *sql.DB) *NodeStore {
-	return &NodeStore{db: db}
+func NewNodeStore(db *sqlx.DB) *NodeStore {
+	return &NodeStore{DB: db}
 }
 
 // Create inserts a new node into the database.
@@ -21,7 +21,7 @@ func (s *NodeStore) Create(node *models.Node) error {
 		INSERT INTO nodes (ip, port, ssh_port, country, comment, is_online, username, password)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id`
-	return s.db.QueryRow(query, node.IP, node.Port, node.SSHPort, node.Country, node.Comment, node.IsOnline, node.Username, node.Password).
+	return s.DB.QueryRow(query, node.IP, node.Port, node.SSHPort, node.Country, node.Comment, node.IsOnline, node.Username, node.Password).
 		Scan(&node.ID)
 }
 
@@ -32,7 +32,7 @@ func (s *NodeStore) Get(id int) (*models.Node, error) {
 		SELECT id, ip, port, ssh_port, country, comment, is_online, username, password
 		FROM nodes
 		WHERE id = $1`
-	err := s.db.QueryRow(query, id).Scan(
+	err := s.DB.QueryRow(query, id).Scan(
 		&node.ID, &node.IP, &node.Port, &node.SSHPort, &node.Country,
 		&node.Comment, &node.IsOnline, &node.Username, &node.Password,
 	)
@@ -50,7 +50,7 @@ func (s *NodeStore) List() ([]*models.Node, error) {
 	query := `
 		SELECT id, ip, port, ssh_port, country, comment, is_online, username, password
 		FROM nodes`
-	rows, err := s.db.Query(query)
+	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list nodes: %w", err)
 	}
@@ -76,7 +76,7 @@ func (s *NodeStore) Update(node *models.Node) error {
 		UPDATE nodes
 		SET ip = $1, port = $2, ssh_port = $3, country = $4, comment = $5, is_online = $6, username = $7, password = $8
 		WHERE id = $9`
-	result, err := s.db.Exec(query, node.IP, node.Port, node.SSHPort, node.Country, node.Comment, node.IsOnline, node.Username, node.Password, node.ID)
+	result, err := s.DB.Exec(query, node.IP, node.Port, node.SSHPort, node.Country, node.Comment, node.IsOnline, node.Username, node.Password, node.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update node: %w", err)
 	}
@@ -93,7 +93,7 @@ func (s *NodeStore) Update(node *models.Node) error {
 // Delete removes a node by ID.
 func (s *NodeStore) Delete(id int) error {
 	query := `DELETE FROM nodes WHERE id = $1`
-	result, err := s.db.Exec(query, id)
+	result, err := s.DB.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete node: %w", err)
 	}

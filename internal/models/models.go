@@ -1,5 +1,10 @@
 package models
 
+import (
+	"github.com/google/uuid"
+	"time"
+)
+
 // SuccessResponse представляет успешный ответ API
 type SuccessResponse struct {
 	Message string `json:"message"`
@@ -12,8 +17,17 @@ type ErrorResponse struct {
 
 // User представляет данные пользователя
 type User struct {
-	ID   string `json:"id"`
-	Flow string `json:"flow"`
+	ID         int64     `json:"id" db:"id"`
+	UUID       uuid.UUID `json:"uuid" db:"uuid"`
+	MacAddress string    `json:"mac_address" db:"mac_address"`
+	NodeID     int       `json:"node_id" db:"node_id"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
+	Status     string    `json:"status" db:"status"`
+}
+
+type UserRequest struct {
+	MacAddress string `json:"mac_address" binding:"required"`
 }
 
 type Node struct {
@@ -23,7 +37,7 @@ type Node struct {
 	SSHPort  int    `json:"ssh_port"`
 	Country  string `json:"country"`
 	Comment  string `json:"comment"`
-	IsOnline bool   `json:"is_online"`
+	IsOnline bool   `json:"is_online" db:"is_online"`
 	Username string `json:"username"`
 	Password string `json:"password,omitempty"`
 }
