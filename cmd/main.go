@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ByteForge-Systems/vpn-api/internal/db"
 	"log"
-
 	_ "github.com/ByteForge-Systems/vpn-api/api/docs"
 	"github.com/ByteForge-Systems/vpn-api/internal/config"
 	"github.com/ByteForge-Systems/vpn-api/internal/db/nodes"

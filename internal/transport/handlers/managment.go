@@ -43,6 +43,7 @@ func (h *NodeHandler) RestartXray(c *gin.Context) {
 	}
 
 	err = node_client.RestartXray(nodeURL)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -52,6 +53,7 @@ func (h *NodeHandler) RestartXray(c *gin.Context) {
 }
 
 // @Summary Получить статус Xray
+
 // @Description Возвращает статус Xray на указанной ноде
 // @Tags Management
 // @Produce json
@@ -74,6 +76,7 @@ func (h *NodeHandler) GetXrayStatus(c *gin.Context) {
 	}
 
 	status, err := node_client.GetXrayStatus(nodeURL)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -83,6 +86,7 @@ func (h *NodeHandler) GetXrayStatus(c *gin.Context) {
 }
 
 // @Summary Запустить Xray
+
 // @Description Запускает Xray на указанной ноде
 // @Tags Management
 // @Produce json
@@ -105,15 +109,16 @@ func (h *NodeHandler) StartXray(c *gin.Context) {
 	}
 
 	err = node_client.StartXray(nodeURL)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": "Xray started"})
 }
 
 // @Summary Остановить Xray
+
 // @Description Останавливает Xray на указанной ноде
 // @Tags Management
 // @Produce json
@@ -130,6 +135,7 @@ func (h *NodeHandler) StopXray(c *gin.Context) {
 	}
 
 	nodeURL, err := h.getNodeURLByID(nodeID)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

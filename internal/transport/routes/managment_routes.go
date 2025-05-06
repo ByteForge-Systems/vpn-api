@@ -12,5 +12,6 @@ func SetupManagementRoutes(router *gin.Engine, handler *handlers.NodeHandler) {
 		management.GET("/status", handler.GetXrayStatus)
 		management.POST("/start", handler.StartXray)
 		management.POST("/stop", handler.StopXray)
+
 	}
 }

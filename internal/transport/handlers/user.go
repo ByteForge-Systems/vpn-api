@@ -1,6 +1,7 @@
 package handlers
 
 import (
+
 	"database/sql"
 	"fmt"
 	"regexp"
@@ -21,11 +22,13 @@ func NewUserHandler(db *sqlx.DB) *UserHandler {
 	return &UserHandler{db: db}
 }
 
+
 // @Summary Добавить пользователя
 // @Description Добавляет нового пользователя в систему
 // @Tags User
 // @Accept json
 // @Produce json
+
 // @Param user body models.UserRequest true "Данные пользователя"
 // @Success 200 {object} models.User
 // @Failure 400 {object} models.ErrorResponse
@@ -123,6 +126,7 @@ func (h *UserHandler) AddUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+
 }
 
 // @Summary Удалить пользователя
@@ -132,6 +136,7 @@ func (h *UserHandler) AddUser(c *gin.Context) {
 // @Param id path string true "ID пользователя"
 // @Success 200 {object} models.SuccessResponse
 // @Failure 404 {object} models.ErrorResponse
+
 // @Router /api/users/{id} [delete]
 func (h *UserHandler) RemoveUser(c *gin.Context) {
 	userID := c.Param("id")
@@ -181,6 +186,7 @@ func (h *UserHandler) RemoveUser(c *gin.Context) {
 // @Tags User
 // @Produce json
 // @Success 200 {array} models.User
+
 // @Router /api/users/all [get]
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	var users []models.User
@@ -200,6 +206,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 // @Param id path string true "ID пользователя"
 // @Success 200 {object} models.VLESSLink
 // @Failure 404 {object} models.ErrorResponse
+
 // @Router /api/users/{id}/link [get]
 func (h *UserHandler) GenerateVLESSLink(c *gin.Context) {
 	userID := c.Param("id")
@@ -231,6 +238,7 @@ func (h *UserHandler) GenerateVLESSLink(c *gin.Context) {
 	link, err := node_client.GenerateVLESSLink(nodeURL, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to generate VLESS link: %v", err)})
+
 		return
 	}
 
@@ -241,3 +249,4 @@ func isValidMacAddress(mac string) bool {
 	matched, _ := regexp.MatchString(`^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$`, mac)
 	return matched
 }
+
