@@ -7,16 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ByteForge-Systems/vpn-api/internal/config"
+	_ "github.com/ByteForge-Systems/vpn-api/internal/config"
 )
-
-var nodeAPIBaseURL string
-
-func init() {
-	config.LoadEnv()
-	nodeAPIBaseURL = config.GetEnv("NODE_API_BASE_URL")
-
-}
 
 type Client struct {
 	ID   string `json:"id"`
@@ -24,8 +16,8 @@ type Client struct {
 }
 
 // AddUser отправляет запрос на добавление пользователя в конфиг
-func AddUser(newUUID string) (string, error) {
-	url := fmt.Sprintf("%s/api/key", nodeAPIBaseURL)
+func AddUser(nodeURL, newUUID string) (string, error) {
+	url := fmt.Sprintf("%s/api/key", nodeURL)
 
 	requestBody := map[string]string{
 		"uuid": newUUID,
@@ -37,11 +29,9 @@ func AddUser(newUUID string) (string, error) {
 	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
-
 	if err != nil {
 		return "", fmt.Errorf("failed to send request: %w", err)
 	}
-
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Printf("warning: failed to close response body: %v", err)
@@ -61,8 +51,8 @@ func AddUser(newUUID string) (string, error) {
 }
 
 // RemoveUser отправляет запрос на удаление пользователя из конфига
-func RemoveUser(userID string) error {
-	url := fmt.Sprintf("%s/api/key/%s", nodeAPIBaseURL, userID)
+func RemoveUser(nodeURL, userID string) error {
+	url := fmt.Sprintf("%s/api/key/%s", nodeURL, userID)
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -86,8 +76,8 @@ func RemoveUser(userID string) error {
 }
 
 // GenerateVLESSLink отправляет запрос на генерацию VLESS-ссылки для пользователя
-func GenerateVLESSLink(userID string) (string, error) {
-	url := fmt.Sprintf("%s/api/key/%s/link", nodeAPIBaseURL, userID)
+func GenerateVLESSLink(nodeURL, userID string) (string, error) {
+	url := fmt.Sprintf("%s/api/key/%s/link", nodeURL, userID)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("failed to send request: %w", err)
@@ -110,8 +100,8 @@ func GenerateVLESSLink(userID string) (string, error) {
 	return result["link"], nil
 }
 
-func GetAllUsers() ([]Client, error) {
-	url := fmt.Sprintf("%s/api/key/all", nodeAPIBaseURL)
+func GetAllUsers(nodeURL string) ([]Client, error) {
+	url := fmt.Sprintf("%s/api/key/all", nodeURL)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
@@ -139,8 +129,8 @@ func GetAllUsers() ([]Client, error) {
 }
 
 // RestartXray отправляет запрос на перезапуск Xray
-func RestartXray() error {
-	url := fmt.Sprintf("%s/api/management/restart", nodeAPIBaseURL)
+func RestartXray(nodeURL string) error {
+	url := fmt.Sprintf("%s/api/management/restart", nodeURL)
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
@@ -159,8 +149,8 @@ func RestartXray() error {
 }
 
 // StartXray отправляет запрос на запуск Xray
-func StartXray() error {
-	url := fmt.Sprintf("%s/api/management/start", nodeAPIBaseURL)
+func StartXray(nodeURL string) error {
+	url := fmt.Sprintf("%s/api/management/start", nodeURL)
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
@@ -178,8 +168,8 @@ func StartXray() error {
 }
 
 // StopXray отправляет запрос на остановку Xray
-func StopXray() error {
-	url := fmt.Sprintf("%s/api/management/stop", nodeAPIBaseURL)
+func StopXray(nodeURL string) error {
+	url := fmt.Sprintf("%s/api/management/stop", nodeURL)
 	resp, err := http.Post(url, "application/json", nil)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
@@ -197,8 +187,8 @@ func StopXray() error {
 }
 
 // GetXrayStatus отправляет запрос на получение статуса Xray
-func GetXrayStatus() (string, error) {
-	url := fmt.Sprintf("%s/api/management/status", nodeAPIBaseURL)
+func GetXrayStatus(nodeURL string) (string, error) {
+	url := fmt.Sprintf("%s/api/management/status", nodeURL)
 	fmt.Println("Requesting URL:", url)
 	resp, err := http.Get(url)
 	if err != nil {
