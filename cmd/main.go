@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/ByteForge-Systems/vpn-api/internal/db"
 	_ "github.com/ByteForge-Systems/vpn-api/api/docs"
 	"github.com/ByteForge-Systems/vpn-api/internal/config"
-	"github.com/ByteForge-Systems/vpn-api/internal/db"
 	"github.com/ByteForge-Systems/vpn-api/internal/db/nodes"
 	"github.com/ByteForge-Systems/vpn-api/internal/transport/handlers"
 	"github.com/ByteForge-Systems/vpn-api/internal/transport/routes"

@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 type ManagementHandler struct {
 	nodeStore *nodes.NodeStore
 }
@@ -41,6 +42,7 @@ func (h *ManagementHandler) getNodeURLByID(nodeID string) (string, error) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/restart [post]
 func (h *ManagementHandler) RestartXray(c *gin.Context) {
+
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})
@@ -74,13 +76,16 @@ func (h *ManagementHandler) RestartXray(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/status [get]
 func (h *ManagementHandler) GetXrayStatus(c *gin.Context) {
+
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})
 		return
 	}
 
+
 	nodeURL, err := h.getNodeURLByID(nodeID)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -92,7 +97,6 @@ func (h *ManagementHandler) GetXrayStatus(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"status": status})
 }
 
@@ -107,6 +111,7 @@ func (h *ManagementHandler) GetXrayStatus(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/start [post]
 func (h *ManagementHandler) StartXray(c *gin.Context) {
+
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})
@@ -139,6 +144,7 @@ func (h *ManagementHandler) StartXray(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/stop [post]
 func (h *ManagementHandler) StopXray(c *gin.Context) {
+
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})
@@ -147,11 +153,11 @@ func (h *ManagementHandler) StopXray(c *gin.Context) {
 
 	nodeURL, err := h.getNodeURLByID(nodeID)
 
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	err = node_client.StopXray(nodeURL)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
