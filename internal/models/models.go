@@ -32,13 +32,15 @@ type UserRequest struct {
 }
 
 type Node struct {
-	ID       int    `json:"id"`
-	IP       string `json:"ip"`
-	Port     int    `json:"port"`
-	SSHPort  int    `json:"ssh_port"`
-	Country  string `json:"country"`
-	Comment  string `json:"comment"`
-	IsOnline bool   `json:"is_online" db:"is_online"`
+
+	ID          int    `json:"id"`
+	IP          string `json:"ip"`
+	Port        int    `json:"port"`
+	SSHPort     int    `json:"ssh_port"`
+	Country     string `json:"country"`
+	Comment     string `json:"comment"`
+	IsOnline    bool   `json:"is_online" db:"is_online"`
+
 	SSHUsername string `json:"ssh_username"`
 	SSHPassword string `json:"ssh_password,omitempty"`
 }

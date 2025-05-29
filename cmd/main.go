@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/ByteForge-Systems/vpn-api/internal/db"
-	"log"
 	_ "github.com/ByteForge-Systems/vpn-api/api/docs"
 	"github.com/ByteForge-Systems/vpn-api/internal/config"
 	"github.com/ByteForge-Systems/vpn-api/internal/db/nodes"
@@ -12,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
 )
 
 // @title Xray Management API
@@ -49,10 +49,12 @@ func main() {
 	// Инициализируем хранилище и хендлер для узлов
 	nodeStore := nodes.NewNodeStore(dbConn)
 	nodesHandler := handlers.NewNodeHandler(nodeStore)
+	managementHandler := handlers.NewManagementHandler(nodeStore)
 
 	// Настраиваем маршруты
 	routes.SetupUserRoutes(router, dbConn)
 	routes.RegisterNodesRoutes(router, nodesHandler)
+	routes.SetupManagementRoutes(router, managementHandler)
 
 	// Запускаем сервер с портом из конфига
 	addr := fmt.Sprintf(":%s", cfg.Port)
