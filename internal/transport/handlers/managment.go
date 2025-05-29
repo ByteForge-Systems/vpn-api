@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/ByteForge-Systems/vpn-api/internal/db/nodes"
 	"github.com/ByteForge-Systems/vpn-api/internal/models"
 	"net/http"
 
@@ -10,10 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type ManagementHandler struct {
+	nodeStore *nodes.NodeStore
+}
+
+func NewManagementHandler(store *nodes.NodeStore) *ManagementHandler {
+	return &ManagementHandler{
+		nodeStore: store,
+	}
+}
+
 // getNodeURLByID получает URL ноды по её ID
-func (h *NodeHandler) getNodeURLByID(nodeID string) (string, error) {
+func (h *ManagementHandler) getNodeURLByID(nodeID string) (string, error) {
 	var node models.Node
-	err := h.store.DB.Get(&node, "SELECT ip, port FROM nodes WHERE id = $1", nodeID)
+	err := h.nodeStore.DB.Get(&node, "SELECT ip, port FROM nodes WHERE id = $1", nodeID)
 	if err != nil {
 		return "", fmt.Errorf("failed to find node: %w", err)
 	}
@@ -29,7 +40,7 @@ func (h *NodeHandler) getNodeURLByID(nodeID string) (string, error) {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/restart [post]
-func (h *NodeHandler) RestartXray(c *gin.Context) {
+func (h *ManagementHandler) RestartXray(c *gin.Context) {
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})
@@ -62,7 +73,7 @@ func (h *NodeHandler) RestartXray(c *gin.Context) {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/status [get]
-func (h *NodeHandler) GetXrayStatus(c *gin.Context) {
+func (h *ManagementHandler) GetXrayStatus(c *gin.Context) {
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})
@@ -95,7 +106,7 @@ func (h *NodeHandler) GetXrayStatus(c *gin.Context) {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/start [post]
-func (h *NodeHandler) StartXray(c *gin.Context) {
+func (h *ManagementHandler) StartXray(c *gin.Context) {
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})
@@ -127,7 +138,7 @@ func (h *NodeHandler) StartXray(c *gin.Context) {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /api/management/{node_id}/stop [post]
-func (h *NodeHandler) StopXray(c *gin.Context) {
+func (h *ManagementHandler) StopXray(c *gin.Context) {
 	nodeID := c.Param("node_id")
 	if nodeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "node_id is required"})

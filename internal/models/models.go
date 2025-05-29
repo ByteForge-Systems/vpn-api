@@ -17,7 +17,6 @@ type ErrorResponse struct {
 
 // User представляет данные пользователя
 type User struct {
-
 	ID         int64     `json:"id" db:"id"`
 	UUID       uuid.UUID `json:"uuid" db:"uuid"`
 	MacAddress string    `json:"mac_address" db:"mac_address"`
@@ -32,13 +31,13 @@ type UserRequest struct {
 }
 
 type Node struct {
-	ID       int    `json:"id"`
-	IP       string `json:"ip"`
-	Port     int    `json:"port"`
-	SSHPort  int    `json:"ssh_port"`
-	Country  string `json:"country"`
-	Comment  string `json:"comment"`
-	IsOnline bool   `json:"is_online" db:"is_online"`
+	ID          int    `json:"id"`
+	IP          string `json:"ip"`
+	Port        int    `json:"port"`
+	SSHPort     int    `json:"ssh_port"`
+	Country     string `json:"country"`
+	Comment     string `json:"comment"`
+	IsOnline    bool   `json:"is_online" db:"is_online"`
 	SSHUsername string `json:"ssh_username"`
 	SSHPassword string `json:"ssh_password,omitempty"`
 }
